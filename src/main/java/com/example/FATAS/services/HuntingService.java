@@ -8,10 +8,10 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
-public class HuntingService {
-    HuntingResponseDto huntFish(HuntingDto huntingDto , String fishName, double huntedFishWeight);
+public interface HuntingService {
+    HuntingResponseDto huntFish(HuntingDto huntingDto, double huntedFishWeight);
     //   List<HuntingResponseDto> getAllHuntings();
-    List<HuntingResponseDto> getAllHuntinges(Pageable pageable);
-    boolean deleteHuntingById(String huntingId);
+    List<HuntingResponseDto> getAllHuntings(Pageable pageable);
+    boolean deleteHuntingById(Integer huntingId);
 //    HuntingResponseDto updateHunting(String huntingId, HuntingDto updatedHuntingDto);
 }

@@ -64,6 +64,12 @@ public class RankingServiceImpl implements RankingService {
                     " " + member.getFamilyName() + "\" is already in this competition.");
         }
 
+        int currentParticipants = rankingRepository.countParticipantsByCompetitionCode(rankingDto.getCode());
+
+        if (currentParticipants >= competition.getNumberOfParticipants()) {
+            throw new ResourceUnprocessableException("Maximum number of participants reached for this competition.");
+        }
+
         LocalDateTime now = LocalDateTime.now();
         long hours = ChronoUnit.HOURS.between(now, competition.getStartTime());
 
@@ -80,7 +86,6 @@ public class RankingServiceImpl implements RankingService {
 
         return modelMapper.map(createdRanking, RankingResponseDto.class);
     }
-
 
 
 
