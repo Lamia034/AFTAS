@@ -18,10 +18,10 @@ public class CompetitionDto {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
    // @NotNull
-    @JsonFormat(pattern = "HH:mm")
+    @JsonFormat(pattern = "HH:mm:ss")
     private LocalTime startTime;
   //  @NotNull
-    @JsonFormat(pattern = "HH:mm")
+    @JsonFormat(pattern = "HH:mm:ss")
     private LocalTime endTime;
     @NotBlank
     private Integer numberOfParticipants;
