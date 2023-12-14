@@ -31,6 +31,11 @@ public class MemberController {
         Pageable pageable = PageRequest.of(page, size);
         return memberService.getAllMembers(pageable);
     }
+    @GetMapping("/{memberId}")
+    public ResponseEntity<MemberResponseDto> getMemberById(@PathVariable Integer memberId) {
+        MemberResponseDto member = memberService.getMemberById(memberId);
+        return ResponseEntity.ok(member);
+    }
 
     @DeleteMapping("/{memberId}")
     public ResponseEntity<String> deleteMember(@PathVariable Integer memberId) {

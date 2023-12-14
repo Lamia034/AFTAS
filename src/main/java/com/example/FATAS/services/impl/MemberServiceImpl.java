@@ -59,6 +59,20 @@ public class MemberServiceImpl implements MemberService {
         }
     }
 
+    @Override
+    @Transactional
+    public MemberResponseDto getMemberById(Integer memberId) {
+        try {
+            Optional<Member> memberOptional = memberRepository.findById(memberId);
+            if (memberOptional.isPresent()) {
+                return modelMapper.map(memberOptional.get(), MemberResponseDto.class);
+            } else {
+                throw new ResourceNotFoundException("Member not found with ID: " + memberId);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to retrieve member: " + e.getMessage());
+        }
+    }
 
 
 

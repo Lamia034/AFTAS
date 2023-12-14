@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface MemberService {
     MemberResponseDto saveMember(MemberDto memberDto);
-
+    MemberResponseDto getMemberById(Integer memberId);
     List<MemberResponseDto> getAllMembers(Pageable pageable);
     boolean deleteMemberById(Integer memberId);
     MemberResponseDto updateMember(Integer memberId, MemberDto updatedMemberDto);

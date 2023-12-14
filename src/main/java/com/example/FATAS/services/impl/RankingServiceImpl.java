@@ -25,6 +25,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
@@ -69,13 +72,26 @@ public class RankingServiceImpl implements RankingService {
         if (currentParticipants >= competition.getNumberOfParticipants()) {
             throw new ResourceUnprocessableException("Maximum number of participants reached for this competition.");
         }
+        ZonedDateTime now = ZonedDateTime.now();
+        ZonedDateTime competitionStartDateTime = ZonedDateTime.of(
+                competition.getDate(),
+                competition.getStartTime(),
+                ZoneId.systemDefault()
+        );
 
-        LocalDateTime now = LocalDateTime.now();
-        long hours = ChronoUnit.HOURS.between(now, competition.getStartTime());
+        long hoursDifference = ChronoUnit.HOURS.between(now, competitionStartDateTime);
 
-        if (hours <= 24) {
-            throw new ResourceUnprocessableException("You cannot assign new participants before 24h or less from the start of the competition.");
+        if (hoursDifference <= 24) {
+            throw new ResourceUnprocessableException("You cannot assign new participants less than 24 hours before the start of the competition.");
         }
+
+
+//        LocalTime now = LocalTime.now();
+//        long hours = ChronoUnit.HOURS.between(now, competition.getStartTime());
+//
+//        if (hours <= 24) {
+//            throw new ResourceUnprocessableException("You cannot assign new participants in less of 24h from the start of the competition.");
+//        }
 
         Ranking ranking = new Ranking();
         ranking.setId(rankingId);
