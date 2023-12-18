@@ -60,6 +60,11 @@ import java.util.stream.Collectors;
             throw new RuntimeException("Failed to retrieve competitions: " + e.getMessage());
         }
     }
+@Override
+@Transactional
+    public long getCompetitionsCount() {
+        return competitionRepository.count();
+    }
 
 
 

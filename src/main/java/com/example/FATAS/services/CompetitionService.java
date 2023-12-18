@@ -12,5 +12,6 @@ public interface CompetitionService {
 //   List<CompetitionResponseDto> getAllCompetitions();
 List<CompetitionResponseDto> getAllCompetitions(Pageable pageable);
 boolean deleteCompetitionById(String competitionId);
+   long getCompetitionsCount();
    CompetitionResponseDto updateCompetition(String competitionId, CompetitionDto updatedCompetitionDto);
 }

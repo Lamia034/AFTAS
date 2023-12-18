@@ -14,10 +14,10 @@ import lombok.Data;
 @Data
 public class RankingDto {
     private RankingId id;
-    @Positive
-    private Integer rank;
-    @PositiveOrZero
-    private Integer score;
+
+    private Integer rank = 0;
+
+    private Integer score = 0;
     @NotBlank(message = "Competition code is necessary.")
     @Pattern(regexp = "^[a-z]{3}-\\d{2}-\\d{2}-\\d{2}$", message = "Invalid competition code format")
     private String code;

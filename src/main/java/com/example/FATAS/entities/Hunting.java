@@ -7,6 +7,7 @@ import lombok.Data;
 @Entity
 public class Hunting {
     @Id
+    @GeneratedValue
     private Integer id;
     private Integer numberOfFish;
     @ManyToOne(fetch = FetchType.EAGER)

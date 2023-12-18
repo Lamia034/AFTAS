@@ -21,12 +21,17 @@ public class HuntingController {
         this.huntingService = huntingService;
     }
 
+//    @PostMapping
+//    public ResponseEntity<HuntingResponseDto> saveHunting(@RequestBody HuntingDto huntingDto, @RequestParam double huntedFishWeight) {
+//        HuntingResponseDto savedHunting = huntingService.huntFish(huntingDto, huntedFishWeight);
+//        return new ResponseEntity<>(savedHunting, HttpStatus.CREATED);
+//    }
+
     @PostMapping
-    public ResponseEntity<HuntingResponseDto> saveHunting(@RequestBody HuntingDto huntingDto, @RequestParam double huntedFishWeight) {
-        HuntingResponseDto savedHunting = huntingService.huntFish(huntingDto, huntedFishWeight);
+    public ResponseEntity<HuntingResponseDto> saveHunting(@RequestBody HuntingDto huntingDto) {
+        HuntingResponseDto savedHunting = huntingService.huntFish(huntingDto);
         return new ResponseEntity<>(savedHunting, HttpStatus.CREATED);
     }
-
 
     @GetMapping
     public List<HuntingResponseDto> getHuntings(@RequestParam(defaultValue = "0") int page,

@@ -1,17 +1,14 @@
 package com.example.FATAS.services.impl;
 
-import com.example.FATAS.dtos.CompetitionResponseDto;
-import com.example.FATAS.dtos.FishResponseDto;
-import com.example.FATAS.dtos.HuntingDto;
-import com.example.FATAS.dtos.HuntingResponseDto;
-import com.example.FATAS.entities.Fish;
-import com.example.FATAS.entities.Hunting;
+import com.example.FATAS.dtos.*;
+import com.example.FATAS.embeddable.RankingId;
+import com.example.FATAS.entities.*;
 import com.example.FATAS.exceptions.ResourceNotFoundException;
 import com.example.FATAS.exceptions.ResourceUnprocessableException;
-import com.example.FATAS.repositories.FishRepository;
-import com.example.FATAS.repositories.HuntingRepository;
+import com.example.FATAS.repositories.*;
 import com.example.FATAS.services.HuntingService;
 import jakarta.transaction.Transactional;
+import org.apache.logging.log4j.Level;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,40 +23,124 @@ public class HuntingServiceImpl implements HuntingService {
 
     private final HuntingRepository huntingRepository;
     private final FishRepository fishRepository;
+    private final CompetitionRepository competitionRepository;
+    private final MemberRepository memberRepository;
+    private final RankingRepository rankingRepository;
     private final ModelMapper modelMapper;
-    public HuntingServiceImpl(HuntingRepository huntingRepository, FishRepository fishRepository,ModelMapper modelMapper) {
+    public HuntingServiceImpl(HuntingRepository huntingRepository, FishRepository fishRepository, CompetitionRepository competitionRepository,MemberRepository memberRepository,RankingRepository rankingRepository,ModelMapper modelMapper) {
         this.huntingRepository = huntingRepository;
         this.fishRepository = fishRepository;
+        this.memberRepository = memberRepository;
+        this.competitionRepository = competitionRepository;
+        this.rankingRepository = rankingRepository;
         this.modelMapper = modelMapper;
     }
-@Override
-@Transactional
-public HuntingResponseDto huntFish(HuntingDto huntingDto, double huntedFishWeight) {
-    String fishName = huntingDto.getName();
 
-    Optional<Fish> optionalFish = fishRepository.findById(fishName);
-    if (optionalFish.isPresent()) {
-        Fish fish = optionalFish.get();
 
-        if (huntedFishWeight >= fish.getAverageWeight()) {
-            Hunting hunting = huntingRepository.findByFishName(fishName);
-            if (hunting != null) {
-                hunting.setNumberOfFish(hunting.getNumberOfFish() + 1);
+
+    @Override
+    @Transactional
+    public HuntingResponseDto huntFish(HuntingDto huntingDto) {
+        String fishName = huntingDto.getName();
+        int numberOfFishes = huntingDto.getNumberOfFish();
+
+        Optional<Fish> optionalFish = fishRepository.findById(fishName);
+        if (optionalFish.isPresent()) {
+            Fish fish = optionalFish.get();
+
+            Optional<Hunting> optionalHunting = huntingRepository.findByFishNameAndCompetitionCodeAndMemberNum(
+                    fishName,
+                    huntingDto.getCode(),
+                    huntingDto.getNum()
+            );
+
+
+            Hunting hunting;
+            if (optionalHunting.isPresent()) {
+                hunting = optionalHunting.get();
+                hunting.setNumberOfFish(hunting.getNumberOfFish() + numberOfFishes);
             } else {
                 hunting = new Hunting();
                 hunting.setFish(fish);
-                hunting.setNumberOfFish(1);
-            }
-            huntingRepository.save(hunting);
-            return modelMapper.map(hunting, HuntingResponseDto.class);
-        } else {
-            throw new ResourceUnprocessableException("Fish not accountable: " + fishName);
-        }
-    } else {
-        throw new ResourceNotFoundException("Fish not found with name: " + fishName);
-    }
-}
+                hunting.setNumberOfFish(numberOfFishes);
 
+                Competition competition = new Competition();
+                competition.setCode(huntingDto.getCode());
+                hunting.setCompetition(competition);
+
+                Member member = new Member();
+                member.setNum(huntingDto.getNum());
+                hunting.setMember(member);
+            }
+
+            huntingRepository.save(hunting);
+
+            int levelPoints = fish.getLevel().getPoints();
+            int score = numberOfFishes * levelPoints;
+           // System.out.println("Code: " + huntingDto.getCode() + ", Num: " + huntingDto.getNum());
+            RankingId key = new RankingId();
+            key.setMemberNum(huntingDto.getNum());
+            key.setCompetitionCode(huntingDto.getCode());
+//            Optional<Ranking> optionalRanking = rankingRepository.findByCompetitionCodeAndMemberNum(huntingDto.getCode(), huntingDto.getNum());
+            rankingRepository.findById(key).orElseThrow(() -> new ResourceNotFoundException("This member is not participated in this competition"));
+
+            updateRankingScore(huntingDto, score);
+            updateRanksForCompetition(huntingDto.getCode());
+
+
+
+            return modelMapper.map(hunting, HuntingResponseDto.class);
+        }
+        return null;
+    }
+
+
+
+
+
+
+    @Transactional
+    public RankingResponseDto updateRankingScore(HuntingDto huntingDto, int scoreToAdd) {
+        Optional<Ranking> optionalRanking = rankingRepository.findByCompetitionCodeAndMemberNum(
+                huntingDto.getCode(),
+                huntingDto.getNum()
+        );
+
+        if (optionalRanking.isPresent()) {
+            Ranking ranking = optionalRanking.get();
+            int existingScore = ranking.getScore();
+            int newScore = existingScore + scoreToAdd;
+
+
+            ranking.setScore(newScore);
+
+            Ranking updatedRanking = rankingRepository.save(ranking);
+
+            return modelMapper.map(updatedRanking, RankingResponseDto.class);
+        } else {
+            throw new ResourceNotFoundException("Ranking not found for the provided competition and member");
+        }
+    }
+    @Transactional
+    public void updateRanksForCompetition(String competitionCode) {
+
+        List<Ranking> rankingsForCompetition = rankingRepository.findByCompetitionCodeOrderByScoreDesc(competitionCode);
+
+        if (!rankingsForCompetition.isEmpty()) {
+            int rank = 0;
+            int previousScore = -1;
+
+            for (Ranking ranking : rankingsForCompetition) {
+                int currentScore = ranking.getScore();
+                if (currentScore != previousScore) {
+                    rank++;
+                }
+                ranking.setRank(rank);
+                rankingRepository.save(ranking);
+                previousScore = currentScore;
+            }
+        }
+    }
 
 
 

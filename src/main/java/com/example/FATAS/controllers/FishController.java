@@ -2,6 +2,7 @@ package com.example.FATAS.controllers;
 
 import com.example.FATAS.dtos.FishDto;
 import com.example.FATAS.dtos.FishResponseDto;
+import com.example.FATAS.dtos.MemberResponseDto;
 import com.example.FATAS.services.FishService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,6 +32,13 @@ public class FishController {
         Pageable pageable = PageRequest.of(page, size);
         return fishService.getAllFishes(pageable);
     }
+
+    @GetMapping("/{fishId}")
+    public ResponseEntity<FishResponseDto> getFishById(@PathVariable String fishId) {
+        FishResponseDto fish = fishService.getFishById(fishId);
+        return ResponseEntity.ok(fish);
+    }
+
 
     @DeleteMapping("/{fishId}")
     public ResponseEntity<String> deleteFish(@PathVariable String fishId) {

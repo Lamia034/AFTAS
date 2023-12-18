@@ -29,12 +29,18 @@ public class RankingController {
         return new ResponseEntity<>(savedRanking, HttpStatus.CREATED);
     }
 
+//    @GetMapping
+//    public List<RankingResponseDto> getRankings(@RequestParam(defaultValue = "0") int page,
+//                                            @RequestParam(defaultValue = "6") int size) {
+//        Pageable pageable = PageRequest.of(page, size);
+//        return rankingService.getAllRankings(pageable);
+//    }
     @GetMapping
-    public List<RankingResponseDto> getRankings(@RequestParam(defaultValue = "0") int page,
-                                            @RequestParam(defaultValue = "6") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return rankingService.getAllRankings(pageable);
+    public List<RankingResponseDto> getTopThreeCompetitors(@RequestParam String competitionCode) {
+        return rankingService.getTopThreeCompetitors(competitionCode);
     }
+
+
 
     @DeleteMapping("/{rankingId}")
     public ResponseEntity<String> deleteRanking(@PathVariable RankingId rankingId) {

@@ -33,6 +33,11 @@ public class CompetitionController {
         Pageable pageable = PageRequest.of(page, size);
         return competitionService.getAllCompetitions(pageable);
     }
+    @GetMapping("/count")
+    public ResponseEntity<Long> getCompetitionsCount() {
+        long count = competitionService.getCompetitionsCount();
+        return ResponseEntity.ok(count);
+    }
 
     @DeleteMapping("/{competitionId}")
     public ResponseEntity<String> deleteCompetition(@PathVariable String competitionId) {

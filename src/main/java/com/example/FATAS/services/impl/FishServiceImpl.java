@@ -2,9 +2,11 @@ package com.example.FATAS.services.impl;
 
 import com.example.FATAS.dtos.FishDto;
 import com.example.FATAS.dtos.FishResponseDto;
+import com.example.FATAS.dtos.MemberResponseDto;
 import com.example.FATAS.entities.Competition;
 import com.example.FATAS.entities.Fish;
 import com.example.FATAS.entities.Level;
+import com.example.FATAS.entities.Member;
 import com.example.FATAS.exceptions.ResourceNotFoundException;
 import com.example.FATAS.repositories.FishRepository;
 import com.example.FATAS.repositories.LevelRepository;
@@ -63,7 +65,20 @@ public class FishServiceImpl implements FishService {
         }
     }
 
-
+    @Override
+    @Transactional
+    public FishResponseDto getFishById(String fishId) {
+        try {
+            Optional<Fish> fishOptional = fishRepository.findById(fishId);
+            if (fishOptional.isPresent()) {
+                return modelMapper.map(fishOptional.get(), FishResponseDto.class);
+            } else {
+                throw new ResourceNotFoundException("Fish not found with ID: " + fishId);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to retrieve fish: " + e.getMessage());
+        }
+    }
 
 
     @Override
@@ -81,6 +96,7 @@ public class FishServiceImpl implements FishService {
             throw new RuntimeException("Failed to delete fishs: " + e.getMessage());
         }
     }
+
     @Override
     @Transactional
     public FishResponseDto updateFish(String fishId, FishDto updatedFishDto) {

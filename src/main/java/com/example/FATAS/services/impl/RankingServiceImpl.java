@@ -41,7 +41,7 @@ public class RankingServiceImpl implements RankingService {
     private final ModelMapper modelMapper;
 
     public RankingServiceImpl(RankingRepository rankingRepository, MemberRepository memberRepository,
-                          CompetitionRepository competitionRepository, ModelMapper modelMapper) {
+                              CompetitionRepository competitionRepository, ModelMapper modelMapper) {
         this.rankingRepository = rankingRepository;
         this.memberRepository = memberRepository;
         this.competitionRepository = competitionRepository;
@@ -97,12 +97,12 @@ public class RankingServiceImpl implements RankingService {
         ranking.setId(rankingId);
         ranking.setMember(member);
         ranking.setCompetition(competition);
-
+        ranking.setRank(0);
+        ranking.setScore(0);
         Ranking createdRanking = rankingRepository.save(ranking);
 
         return modelMapper.map(createdRanking, RankingResponseDto.class);
     }
-
 
 
     @Override
@@ -118,6 +118,16 @@ public class RankingServiceImpl implements RankingService {
         }
     }
 
+@Override
+@Transactional
+    public List<RankingResponseDto> getTopThreeCompetitors(String competitionCode) {
+
+        List<Ranking> rankings = rankingRepository.findByCompetitionCodeOrderByRankAsc(competitionCode);
+
+        return rankings.stream()
+                .map(ranking -> modelMapper.map(ranking, RankingResponseDto.class))
+                .collect(Collectors.toList());
+    }
 
 
 
@@ -157,6 +167,11 @@ public class RankingServiceImpl implements RankingService {
                         .orElseThrow(() -> new ResourceNotFoundException("Member not found."));
                 existingRanking.setMember(member);
             }
+
+            if (updatedRankingDto.getScore() != null) {
+                existingRanking.setScore(updatedRankingDto.getScore());
+            }
+
             Ranking updatedRanking = rankingRepository.save(existingRanking);
 
             return modelMapper.map(updatedRanking, RankingResponseDto.class);
