@@ -75,6 +75,23 @@ public class MemberServiceImpl implements MemberService {
     }
 
 
+@Override
+@Transactional
+public List<MemberResponseDto> getMembersByPartialName(String partialName) {
+    List<Member> members = memberRepository.findByNameContaining(partialName);
+    return members.stream()
+            .map(member -> modelMapper.map(member, MemberResponseDto.class))
+            .collect(Collectors.toList());
+}
+
+    @Override
+    @Transactional
+    public List<MemberResponseDto> getMembersByPartialFamilyName(String partialFamilyName) {
+        List<Member> members = memberRepository.findByFamilyNameContaining(partialFamilyName);
+        return members.stream()
+                .map(member -> modelMapper.map(member, MemberResponseDto.class))
+                .collect(Collectors.toList());
+    }
 
     @Override
     @Transactional

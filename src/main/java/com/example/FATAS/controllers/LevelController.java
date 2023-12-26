@@ -3,6 +3,7 @@ package com.example.FATAS.controllers;
 import com.example.FATAS.dtos.LevelDto;
 import com.example.FATAS.dtos.LevelResponseDto;
 import com.example.FATAS.services.LevelService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -22,7 +23,7 @@ public class LevelController {
     }
 
     @PostMapping
-    public ResponseEntity<LevelResponseDto> saveLevel(@RequestBody LevelDto levelDto) {
+    public ResponseEntity<LevelResponseDto> saveLevel(@Valid @RequestBody LevelDto levelDto) {
         LevelResponseDto savedLevel = levelService.saveLevel(levelDto);
         return new ResponseEntity<>(savedLevel, HttpStatus.CREATED);
     }

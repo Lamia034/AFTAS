@@ -3,6 +3,7 @@ package com.example.FATAS.controllers;
 import com.example.FATAS.dtos.HuntingDto;
 import com.example.FATAS.dtos.HuntingResponseDto;
 import com.example.FATAS.services.HuntingService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -21,14 +22,9 @@ public class HuntingController {
         this.huntingService = huntingService;
     }
 
-//    @PostMapping
-//    public ResponseEntity<HuntingResponseDto> saveHunting(@RequestBody HuntingDto huntingDto, @RequestParam double huntedFishWeight) {
-//        HuntingResponseDto savedHunting = huntingService.huntFish(huntingDto, huntedFishWeight);
-//        return new ResponseEntity<>(savedHunting, HttpStatus.CREATED);
-//    }
 
     @PostMapping
-    public ResponseEntity<HuntingResponseDto> saveHunting(@RequestBody HuntingDto huntingDto) {
+    public ResponseEntity<HuntingResponseDto> saveHunting(@Valid @RequestBody HuntingDto huntingDto) {
         HuntingResponseDto savedHunting = huntingService.huntFish(huntingDto);
         return new ResponseEntity<>(savedHunting, HttpStatus.CREATED);
     }
@@ -46,17 +42,5 @@ public class HuntingController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Hunting deleted successfully");
     }
 
-//    @PutMapping("/{huntingId}")
-//    public ResponseEntity<HuntingResponseDto> updateHunting(
-//            @PathVariable Integer huntingId,
-//            @RequestBody HuntingDto updatedHuntingDto) {
-//
-//        HuntingResponseDto updatedHunting = huntingService.updateHunting(huntingId, updatedHuntingDto);
-//
-//        if (updatedHunting != null) {
-//            return ResponseEntity.ok(updatedHunting);
-//        } else {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
+
 }

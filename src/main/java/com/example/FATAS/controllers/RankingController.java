@@ -5,6 +5,7 @@ import com.example.FATAS.dtos.RankingDto;
 import com.example.FATAS.dtos.RankingResponseDto;
 import com.example.FATAS.embeddable.RankingId;
 import com.example.FATAS.services.RankingService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -24,17 +25,12 @@ public class RankingController {
     }
 
     @PostMapping
-    public ResponseEntity<RankingResponseDto> saveRanking(@RequestBody RankingDto rankingDto) {
+    public ResponseEntity<RankingResponseDto> saveRanking(@Valid @RequestBody RankingDto rankingDto) {
         RankingResponseDto savedRanking = rankingService.saveRanking(rankingDto);
         return new ResponseEntity<>(savedRanking, HttpStatus.CREATED);
     }
 
-//    @GetMapping
-//    public List<RankingResponseDto> getRankings(@RequestParam(defaultValue = "0") int page,
-//                                            @RequestParam(defaultValue = "6") int size) {
-//        Pageable pageable = PageRequest.of(page, size);
-//        return rankingService.getAllRankings(pageable);
-//    }
+
     @GetMapping
     public List<RankingResponseDto> getTopThreeCompetitors(@RequestParam String competitionCode) {
         return rankingService.getTopThreeCompetitors(competitionCode);

@@ -12,6 +12,7 @@ import java.util.List;
 
 @Data
 public class MemberResponseDto {
+
     private Integer num;
     private String name;
     private String familyName;

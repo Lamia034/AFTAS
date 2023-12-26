@@ -10,7 +10,6 @@ import java.util.List;
 public class FishResponseDto {
     private String name;//id
     private Double averageWeight;
-
     private LevelDto level;//level
     private List<HuntingDto> huntings;
 }

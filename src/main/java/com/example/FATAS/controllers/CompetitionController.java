@@ -4,6 +4,7 @@ package com.example.FATAS.controllers;
 import com.example.FATAS.dtos.CompetitionDto;
 import com.example.FATAS.dtos.CompetitionResponseDto;
 import com.example.FATAS.services.CompetitionService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,7 +24,7 @@ public class CompetitionController {
         this.competitionService = competitionService;
     }
     @PostMapping
-    public ResponseEntity<CompetitionResponseDto> saveCompetition(@RequestBody CompetitionDto competitionDto) {
+    public ResponseEntity<CompetitionResponseDto> saveCompetition(@Valid @RequestBody CompetitionDto competitionDto) {
         CompetitionResponseDto savedCompetition = competitionService.saveCompetition(competitionDto);
         return new ResponseEntity<>(savedCompetition, HttpStatus.CREATED);
     }

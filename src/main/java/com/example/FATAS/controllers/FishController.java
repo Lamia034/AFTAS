@@ -4,6 +4,7 @@ import com.example.FATAS.dtos.FishDto;
 import com.example.FATAS.dtos.FishResponseDto;
 import com.example.FATAS.dtos.MemberResponseDto;
 import com.example.FATAS.services.FishService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -22,7 +23,7 @@ public class FishController {
         this.fishService = fishService;
     }
     @PostMapping
-    public ResponseEntity<FishResponseDto> saveFish(@RequestBody FishDto fishDto) {
+    public ResponseEntity<FishResponseDto> saveFish(@Valid @RequestBody FishDto fishDto) {
         FishResponseDto savedFish = fishService.saveFish(fishDto);
         return new ResponseEntity<>(savedFish, HttpStatus.CREATED);
     }

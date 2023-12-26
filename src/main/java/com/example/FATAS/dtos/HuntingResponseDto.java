@@ -8,5 +8,5 @@ public class HuntingResponseDto {
     private Integer numberOfFish;
     private CompetitionDto competition;//competition
     private MemberDto member;//member
-    private FishDto fish;//fish
+    private FishResponseDto fish;//fish
 }

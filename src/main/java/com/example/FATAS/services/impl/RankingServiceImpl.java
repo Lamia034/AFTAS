@@ -86,12 +86,7 @@ public class RankingServiceImpl implements RankingService {
         }
 
 
-//        LocalTime now = LocalTime.now();
-//        long hours = ChronoUnit.HOURS.between(now, competition.getStartTime());
-//
-//        if (hours <= 24) {
-//            throw new ResourceUnprocessableException("You cannot assign new participants in less of 24h from the start of the competition.");
-//        }
+
 
         Ranking ranking = new Ranking();
         ranking.setId(rankingId);

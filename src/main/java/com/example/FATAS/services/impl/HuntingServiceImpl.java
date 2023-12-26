@@ -37,7 +37,6 @@ public class HuntingServiceImpl implements HuntingService {
     }
 
 
-
     @Override
     @Transactional
     public HuntingResponseDto huntFish(HuntingDto huntingDto) {
@@ -45,58 +44,53 @@ public class HuntingServiceImpl implements HuntingService {
         int numberOfFishes = huntingDto.getNumberOfFish();
 
         Optional<Fish> optionalFish = fishRepository.findById(fishName);
-        if (optionalFish.isPresent()) {
-            Fish fish = optionalFish.get();
-
-            Optional<Hunting> optionalHunting = huntingRepository.findByFishNameAndCompetitionCodeAndMemberNum(
-                    fishName,
-                    huntingDto.getCode(),
-                    huntingDto.getNum()
-            );
-
-
-            Hunting hunting;
-            if (optionalHunting.isPresent()) {
-                hunting = optionalHunting.get();
-                hunting.setNumberOfFish(hunting.getNumberOfFish() + numberOfFishes);
-            } else {
-                hunting = new Hunting();
-                hunting.setFish(fish);
-                hunting.setNumberOfFish(numberOfFishes);
-
-                Competition competition = new Competition();
-                competition.setCode(huntingDto.getCode());
-                hunting.setCompetition(competition);
-
-                Member member = new Member();
-                member.setNum(huntingDto.getNum());
-                hunting.setMember(member);
-            }
-
-            huntingRepository.save(hunting);
-
-            int levelPoints = fish.getLevel().getPoints();
-            int score = numberOfFishes * levelPoints;
-           // System.out.println("Code: " + huntingDto.getCode() + ", Num: " + huntingDto.getNum());
-            RankingId key = new RankingId();
-            key.setMemberNum(huntingDto.getNum());
-            key.setCompetitionCode(huntingDto.getCode());
-//            Optional<Ranking> optionalRanking = rankingRepository.findByCompetitionCodeAndMemberNum(huntingDto.getCode(), huntingDto.getNum());
-            rankingRepository.findById(key).orElseThrow(() -> new ResourceNotFoundException("This member is not participated in this competition"));
-
-            updateRankingScore(huntingDto, score);
-            updateRanksForCompetition(huntingDto.getCode());
-
-
-
-            return modelMapper.map(hunting, HuntingResponseDto.class);
+        if (optionalFish.isEmpty()) {
+            throw new ResourceNotFoundException("Fish not found with name: " + fishName);
         }
-        return null;
+
+        Fish fish = optionalFish.get();
+
+        Optional<Hunting> optionalHunting = huntingRepository.findByFishNameAndCompetitionCodeAndMemberNum(
+                fishName,
+                huntingDto.getCode(),
+                huntingDto.getNum()
+        );
+
+        Hunting hunting;
+        if (optionalHunting.isPresent()) {
+            hunting = optionalHunting.get();
+            hunting.setNumberOfFish(hunting.getNumberOfFish() + numberOfFishes);
+        } else {
+            hunting = new Hunting();
+            hunting.setFish(fish);
+            hunting.setNumberOfFish(numberOfFishes);
+
+            Competition competition = new Competition();
+            competition.setCode(huntingDto.getCode());
+            hunting.setCompetition(competition);
+
+            Member member = new Member();
+            member.setNum(huntingDto.getNum());
+            hunting.setMember(member);
+        }
+
+        huntingRepository.save(hunting);
+
+        int levelPoints = fish.getLevel().getPoints();
+        int score = numberOfFishes * levelPoints;
+
+        RankingId key = new RankingId();
+        key.setMemberNum(huntingDto.getNum());
+        key.setCompetitionCode(huntingDto.getCode());
+
+        Ranking ranking = rankingRepository.findById(key)
+                .orElseThrow(() -> new ResourceNotFoundException("This member is not participated in this competition"));
+
+        updateRankingScore(huntingDto, score);
+        updateRanksForCompetition(huntingDto.getCode());
+
+        return modelMapper.map(hunting, HuntingResponseDto.class);
     }
-
-
-
-
 
 
     @Transactional
